@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, ArrowRightLeft, Wallet, DollarSign, RefreshCw } from 'lucide-react';
 import { accountAPI } from '../services/api';
 import { useToast } from '../hooks/useToast';
+import { useTheme } from '../contexts/ThemeContext';
 
 const MultiAccountManager = () => {
   const { showSuccess, showError } = useToast();
+  const { isDark } = useTheme();
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
@@ -153,33 +155,33 @@ const MultiAccountManager = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+    <div className={`min-h-screen ${isDark ? 'bg-gradient-to-br from-gray-900 to-gray-800' : 'bg-gradient-to-br from-slate-50 to-slate-100'} p-6 mt-6`}>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-800 mb-2">Multi-Account Management</h1>
-          <p className="text-slate-600">Manage all your financial accounts in one place</p>
+          <h1 className={`text-4xl font-bold ${isDark ? 'text-white' : 'text-slate-800'} mb-2`}>Multi-Account Management</h1>
+          <p className={`${isDark ? 'text-gray-400' : 'text-slate-600'}`}>Manage all your financial accounts in one place</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-blue-500">
+          <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-2xl shadow-lg p-6 border-l-4 border-blue-500`}>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-600 text-sm font-medium">Total Balance</span>
+              <span className={`${isDark ? 'text-gray-400' : 'text-slate-600'} text-sm font-medium`}>Total Balance</span>
               <DollarSign className="w-5 h-5 text-blue-500" />
             </div>
-            <p className="text-3xl font-bold text-slate-800">₹{totalBalance.toFixed(2)}</p>
+            <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>₹{totalBalance.toFixed(2)}</p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-l-4 border-green-500">
+          <div className={`${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white'} rounded-2xl shadow-lg p-6 border-l-4 border-green-500`}>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-slate-600 text-sm font-medium">Total Accounts</span>
+              <span className={`${isDark ? 'text-gray-400' : 'text-slate-600'} text-sm font-medium`}>Total Accounts</span>
               <Wallet className="w-5 h-5 text-green-500" />
             </div>
-            <p className="text-3xl font-bold text-slate-800">{accounts.length}</p>
+            <p className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>{accounts.length}</p>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-lg p-6 flex items-center justify-between">
+          <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg p-6 flex items-center justify-between`}>
             <div>
-              <span className="text-slate-600 text-sm font-medium block mb-2">Quick Actions</span>
+              <span className={`${isDark ? 'text-gray-400' : 'text-slate-600'} text-sm font-medium block mb-2`}>Quick Actions</span>
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowTransferModal(true)}
@@ -189,7 +191,7 @@ const MultiAccountManager = () => {
                 </button>
                 <button
                   onClick={handleSync}
-                  className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition text-sm font-medium flex items-center gap-1"
+                  className={`px-4 py-2 ${isDark ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'} rounded-lg transition text-sm font-medium flex items-center gap-1`}
                 >
                   <RefreshCw className="w-4 h-4" />
                   Sync
@@ -199,9 +201,9 @@ const MultiAccountManager = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg p-6 mb-6`}>
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-slate-800">Your Accounts</h2>
+            <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>Your Accounts</h2>
             <button
               onClick={handleAddAccount}
               className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition font-medium"
@@ -212,24 +214,24 @@ const MultiAccountManager = () => {
           </div>
 
           {fetchLoading ? (
-            <div className="text-center py-12 text-slate-500">Loading accounts...</div>
+            <div className={`text-center py-12 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>Loading accounts...</div>
           ) : accounts.length === 0 ? (
-            <div className="text-center py-12 text-slate-500">
+            <div className={`text-center py-12 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
               <p className="text-lg mb-2">No accounts yet</p>
               <p className="text-sm">Click "Add Account" to get started</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {accounts.map(account => (
-                <div key={account._id} className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl p-6 border border-slate-200 hover:shadow-md transition">
+                <div key={account._id} className={`${isDark ? 'bg-gray-700 border-gray-600' : 'bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200'} rounded-xl p-6 border hover:shadow-md transition`}>
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className={`w-12 h-12 ${account.color || colors[0]} rounded-lg flex items-center justify-center`}>
                         <Wallet className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-slate-800">{account.name}</h3>
-                        <p className="text-xs text-slate-500 capitalize">{account.type}</p>
+                        <h3 className={`font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>{account.name}</h3>
+                        <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-slate-500'} capitalize`}>{account.type}</p>
                         {account.isDefault && (
                           <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded mt-1 inline-block">Default</span>
                         )}
@@ -238,21 +240,21 @@ const MultiAccountManager = () => {
                     <div className="flex gap-1">
                       <button
                         onClick={() => handleEditAccount(account)}
-                        className="p-2 text-slate-600 hover:bg-slate-200 rounded-lg transition"
+                        className={`p-2 ${isDark ? 'text-gray-400 hover:bg-gray-600' : 'text-slate-600 hover:bg-slate-200'} rounded-lg transition`}
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteAccount(account._id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition"
+                        className={`p-2 text-red-600 ${isDark ? 'hover:bg-red-900/30' : 'hover:bg-red-50'} rounded-lg transition`}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
-                  <div className="mt-4 pt-4 border-t border-slate-200">
-                    <p className="text-sm text-slate-600 mb-1">Current Balance</p>
-                    <p className="text-2xl font-bold text-slate-800">₹{account.balance.toFixed(2)}</p>
+                  <div className={`mt-4 pt-4 ${isDark ? 'border-gray-600' : 'border-slate-200'} border-t`}>
+                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-slate-600'} mb-1`}>Current Balance</p>
+                    <p className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>₹{account.balance.toFixed(2)}</p>
                   </div>
                 </div>
               ))}
@@ -263,27 +265,27 @@ const MultiAccountManager = () => {
         {/* Add/Edit Account Modal */}
         {showModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl p-6 max-w-md w-full">
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">
+            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-6 max-w-md w-full`}>
+              <h3 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-800'} mb-4`}>
                 {editingAccount ? 'Edit Account' : 'Add New Account'}
               </h3>
               <div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Account Name</label>
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-slate-700'} mb-2`}>Account Name</label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-4 py-2 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300 text-slate-900'} border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
                     placeholder="e.g., Main Checking"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Account Type</label>
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-slate-700'} mb-2`}>Account Type</label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-4 py-2 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300 text-slate-900'} border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
                   >
                     {accountTypes.map(type => (
                       <option key={type.value} value={type.value}>{type.label}</option>
@@ -291,13 +293,13 @@ const MultiAccountManager = () => {
                   </select>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Initial Balance</label>
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-slate-700'} mb-2`}>Initial Balance</label>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.balance}
                     onChange={(e) => setFormData({ ...formData, balance: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-4 py-2 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300 text-slate-900'} border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
                     placeholder="0.00"
                   />
                 </div>
@@ -310,7 +312,7 @@ const MultiAccountManager = () => {
                         onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
                         className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                       />
-                      <span className="text-sm text-slate-700">Set as default account</span>
+                      <span className={`text-sm ${isDark ? 'text-gray-300' : 'text-slate-700'}`}>Set as default account</span>
                     </label>
                   </div>
                 )}
@@ -318,7 +320,7 @@ const MultiAccountManager = () => {
                   <button
                     onClick={() => { setShowModal(false); setFormData({ name: '', type: 'checking', balance: '', isDefault: false }); }}
                     disabled={loading}
-                    className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition font-medium disabled:opacity-50"
+                    className={`flex-1 px-4 py-2 ${isDark ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-slate-300 text-slate-700 hover:bg-slate-50'} border rounded-lg transition font-medium disabled:opacity-50`}
                   >
                     Cancel
                   </button>
@@ -338,20 +340,20 @@ const MultiAccountManager = () => {
         {/* Transfer Modal */}
         {showTransferModal && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-2xl p-6 max-w-md w-full">
+            <div className={`${isDark ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-6 max-w-md w-full`}>
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
                   <ArrowRightLeft className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-slate-800">Transfer Funds</h3>
+                <h3 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>Transfer Funds</h3>
               </div>
               <div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">From Account</label>
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-slate-700'} mb-2`}>From Account</label>
                   <select
                     value={transferData.from}
                     onChange={(e) => setTransferData({ ...transferData, from: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className={`w-full px-4 py-2 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300 text-slate-900'} border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500`}
                   >
                     <option value="">Select account</option>
                     {accounts.map(acc => (
@@ -362,11 +364,11 @@ const MultiAccountManager = () => {
                   </select>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">To Account</label>
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-slate-700'} mb-2`}>To Account</label>
                   <select
                     value={transferData.to}
                     onChange={(e) => setTransferData({ ...transferData, to: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className={`w-full px-4 py-2 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300 text-slate-900'} border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500`}
                   >
                     <option value="">Select account</option>
                     {accounts.map(acc => (
@@ -375,13 +377,13 @@ const MultiAccountManager = () => {
                   </select>
                 </div>
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-slate-700'} mb-2`}>Amount</label>
                   <input
                     type="number"
                     step="0.01"
                     value={transferData.amount}
                     onChange={(e) => setTransferData({ ...transferData, amount: e.target.value })}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className={`w-full px-4 py-2 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-slate-300 text-slate-900'} border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500`}
                     placeholder="0.00"
                   />
                 </div>
@@ -389,7 +391,7 @@ const MultiAccountManager = () => {
                   <button
                     onClick={() => { setShowTransferModal(false); setTransferData({ from: '', to: '', amount: '' }); }}
                     disabled={loading}
-                    className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition font-medium disabled:opacity-50"
+                    className={`flex-1 px-4 py-2 ${isDark ? 'border-gray-600 text-gray-300 hover:bg-gray-700' : 'border-slate-300 text-slate-700 hover:bg-slate-50'} border rounded-lg transition font-medium disabled:opacity-50`}
                   >
                     Cancel
                   </button>

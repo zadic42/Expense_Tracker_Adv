@@ -24,6 +24,7 @@ import {
 import Navbar from "../components/Navbar";
 import { dashboardAPI } from "../services/api";
 import { useToast } from "../hooks/useToast";
+import { useTheme } from '../contexts/ThemeContext'
 
 const COLORS = ["#6366f1", "#f59e0b", "#10b981", "#ef4444", "#3b82f6"];
 
@@ -38,6 +39,7 @@ export const Dashboard = () => {
         topCategories: [],
         summary: { totalIncome: 0, totalExpense: 0, balance: 0 },
     });
+    const { isDark } = useTheme();
 
     useEffect(() => {
         fetchDashboardData();
@@ -90,18 +92,18 @@ export const Dashboard = () => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="text-xl text-gray-600">Loading dashboard...</div>
+            <div className={`flex items-center justify-center min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                <div className={`text-xl ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Loading dashboard...</div>
             </div>
         );
     }
 
     return (
         <>
-            <div className="flex bg-gray-50 min-h-screen">
+            <div className={`flex min-h-screen mt-1 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
                 {/* Dashboard Content */}
                 <div className="flex-1 overflow-y-auto">
-                    <h1 className="text-2xl font-bold text-gray-800 mb-6">Dashboard</h1>
+                    <h1 className={`text-2xl font-bold mb-6 ${isDark ? 'text-white' : 'text-gray-800'}`}>Dashboard</h1>
 
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -121,8 +123,8 @@ export const Dashboard = () => {
 
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
                         {/* Expense Breakdown */}
-                        <div className="bg-white rounded-2xl shadow p-4">
-                            <h2 className="font-semibold mb-2 flex items-center gap-2">
+                        <div className={`rounded-2xl shadow p-4 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+                            <h2 className={`font-semibold mb-2 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
                                 <ChartBarIcon className="w-5 h-5 text-indigo-500" />
                                 Expense Breakdown
                             </h2>
@@ -140,68 +142,68 @@ export const Dashboard = () => {
                                                 <Cell key={index} fill={COLORS[index % COLORS.length]} />
                                             ))}
                                         </Pie>
-                                        <Tooltip />
+                                        <Tooltip contentStyle={isDark ? { backgroundColor: '#1f2937', border: '1px solid #374151', color: '#fff' } : {}} />
                                     </PieChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <div className="h-64 flex items-center justify-center text-gray-400">
+                                <div className={`h-64 flex items-center justify-center ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                                     No expense data available
                                 </div>
                             )}
                         </div>
 
                         {/* Income vs Expense */}
-                        <div className="bg-white rounded-2xl shadow p-4">
-                            <h2 className="font-semibold mb-2 flex items-center gap-2">
+                        <div className={`rounded-2xl shadow p-4 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+                            <h2 className={`font-semibold mb-2 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
                                 <ArrowTrendingUpIcon className="w-5 h-5 text-green-500" />
                                 Income vs Expense
                             </h2>
                             {stats.incomeVsExpense.length > 0 ? (
                                 <ResponsiveContainer width="100%" height={250}>
                                     <BarChart data={stats.incomeVsExpense}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="month" />
-                                        <YAxis />
-                                        <Tooltip />
+                                        <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#374151' : '#e5e7eb'} />
+                                        <XAxis dataKey="month" stroke={isDark ? '#9ca3af' : '#6b7280'} />
+                                        <YAxis stroke={isDark ? '#9ca3af' : '#6b7280'} />
+                                        <Tooltip contentStyle={isDark ? { backgroundColor: '#1f2937', border: '1px solid #374151', color: '#fff' } : {}} />
                                         <Legend />
                                         <Bar dataKey="income" fill="#10b981" />
                                         <Bar dataKey="expense" fill="#ef4444" />
                                     </BarChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <div className="h-64 flex items-center justify-center text-gray-400">
+                                <div className={`h-64 flex items-center justify-center ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                                     No data available
                                 </div>
                             )}
                         </div>
 
                         {/* Monthly Spending Trend */}
-                        <div className="bg-white rounded-2xl shadow p-4">
-                            <h2 className="font-semibold mb-2 flex items-center gap-2">
+                        <div className={`rounded-2xl shadow p-4 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+                            <h2 className={`font-semibold mb-2 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
                                 <BanknotesIcon className="w-5 h-5 text-blue-500" />
                                 Spending Trends
                             </h2>
                             {stats.incomeVsExpense.length > 0 ? (
                                 <ResponsiveContainer width="100%" height={250}>
                                     <LineChart data={stats.incomeVsExpense}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="month" />
-                                        <YAxis />
-                                        <Tooltip />
+                                        <CartesianGrid strokeDasharray="3 3" stroke={isDark ? '#374151' : '#e5e7eb'} />
+                                        <XAxis dataKey="month" stroke={isDark ? '#9ca3af' : '#6b7280'} />
+                                        <YAxis stroke={isDark ? '#9ca3af' : '#6b7280'} />
+                                        <Tooltip contentStyle={isDark ? { backgroundColor: '#1f2937', border: '1px solid #374151', color: '#fff' } : {}} />
                                         <Legend />
                                         <Line type="monotone" dataKey="expense" stroke="#6366f1" />
                                     </LineChart>
                                 </ResponsiveContainer>
                             ) : (
-                                <div className="h-64 flex items-center justify-center text-gray-400">
+                                <div className={`h-64 flex items-center justify-center ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                                     No data available
                                 </div>
                             )}
                         </div>
 
                         {/* Account Balances */}
-                        <div className="bg-white rounded-2xl shadow p-4 xl:col-span-1">
-                            <h2 className="font-semibold mb-2 flex items-center gap-2">
+                        <div className={`rounded-2xl shadow p-4 xl:col-span-1 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+                            <h2 className={`font-semibold mb-2 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
                                 <BanknotesIcon className="w-5 h-5 text-yellow-500" />
                                 Account Balances
                             </h2>
@@ -210,7 +212,7 @@ export const Dashboard = () => {
                                     {stats.accountBalances.map((acc, i) => (
                                         <li
                                             key={i}
-                                            className="flex justify-between border-b pb-2 text-gray-700"
+                                            className={`flex justify-between border-b pb-2 ${isDark ? 'text-gray-300 border-gray-700' : 'text-gray-700 border-gray-200'}`}
                                         >
                                             <span>{acc.name}</span>
                                             <span
@@ -223,15 +225,15 @@ export const Dashboard = () => {
                                     ))}
                                 </ul>
                             ) : (
-                                <div className="py-8 text-center text-gray-400">
+                                <div className={`py-8 text-center ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                                     No accounts found
                                 </div>
                             )}
                         </div>
 
                         {/* Top Categories */}
-                        <div className="bg-white rounded-2xl shadow p-4 xl:col-span-1">
-                            <h2 className="font-semibold mb-2 flex items-center gap-2">
+                        <div className={`rounded-2xl shadow p-4 xl:col-span-1 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+                            <h2 className={`font-semibold mb-2 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
                                 <ChartBarIcon className="w-5 h-5 text-purple-500" />
                                 Top Categories
                             </h2>
@@ -240,7 +242,7 @@ export const Dashboard = () => {
                                     {stats.topCategories.map((cat, i) => (
                                         <li
                                             key={i}
-                                            className="flex justify-between border-b pb-2 text-gray-700"
+                                            className={`flex justify-between border-b pb-2 ${isDark ? 'text-gray-300 border-gray-700' : 'text-gray-700 border-gray-200'}`}
                                         >
                                             <span>{cat.name}</span>
                                             <span>₹{cat.value.toFixed(2)}</span>
@@ -248,15 +250,15 @@ export const Dashboard = () => {
                                     ))}
                                 </ul>
                             ) : (
-                                <div className="py-8 text-center text-gray-400">
+                                <div className={`py-8 text-center ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                                     No categories found
                                 </div>
                             )}
                         </div>
 
                         {/* Recent Transactions */}
-                        <div className="bg-white rounded-2xl shadow p-4 xl:col-span-1">
-                            <h2 className="font-semibold mb-2 flex items-center gap-2">
+                        <div className={`rounded-2xl shadow p-4 xl:col-span-1 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+                            <h2 className={`font-semibold mb-2 flex items-center gap-2 ${isDark ? 'text-white' : 'text-gray-800'}`}>
                                 <ClockIcon className="w-5 h-5 text-gray-500" />
                                 Recent Transactions
                             </h2>
@@ -265,11 +267,11 @@ export const Dashboard = () => {
                                     {stats.recentTransactions.map((tx) => (
                                         <li
                                             key={tx.id}
-                                            className="flex justify-between border-b pb-2 text-gray-700"
+                                            className={`flex justify-between border-b pb-2 ${isDark ? 'text-gray-300 border-gray-700' : 'text-gray-700 border-gray-200'}`}
                                         >
                                             <div>
-                                                <p className="font-medium">{tx.name}</p>
-                                                <p className="text-sm text-gray-400">{tx.date}</p>
+                                                <p className={`font-medium ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>{tx.name}</p>
+                                                <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>{tx.date}</p>
                                             </div>
                                             <span
                                                 className={`font-semibold ${tx.amount < 0 ? "text-red-500" : "text-green-600"
@@ -281,7 +283,7 @@ export const Dashboard = () => {
                                     ))}
                                 </ul>
                             ) : (
-                                <div className="py-8 text-center text-gray-400">
+                                <div className={`py-8 text-center ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                                     No recent transactions
                                 </div>
                             )}

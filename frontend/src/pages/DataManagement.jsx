@@ -2,9 +2,11 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Download, Upload, Database, FileText, AlertCircle, CheckCircle, X } from 'lucide-react';
 import { transactionAPI } from '../services/api';
 import { useToast } from '../hooks/useToast';
+import { useTheme } from '../contexts/ThemeContext';
 
 const DataManagement = () => {
   const { showSuccess, showError, showWarning } = useToast();
+  const { isDark } = useTheme();
   const [transactions, setTransactions] = useState([]);
   const [importFile, setImportFile] = useState(null);
   const [importStatus, setImportStatus] = useState(null);
@@ -262,7 +264,7 @@ const DataManagement = () => {
         version: '1.0',
         timestamp: new Date().toISOString(),
         transactions: transactions,
-        settings: { currency: 'INR', theme: 'light' }
+        settings: { currency: 'INR', theme: isDark ? 'dark' : 'light' }
       };
 
       const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
@@ -334,30 +336,30 @@ const DataManagement = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6 flex items-center justify-center">
-        <div className="text-xl text-gray-600">Loading data...</div>
+      <div className={`min-h-screen p-6 flex items-center justify-center ${isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-slate-100'}`}>
+        <div className={`text-xl ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Loading data...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+    <div className={`min-h-screen mt-6 p-6 ${isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-slate-100'}`}>
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-800 mb-2">Data Management</h1>
-          <p className="text-slate-600">Export, import, and backup your financial data</p>
+          <h1 className={`text-4xl font-bold mb-2 ${isDark ? 'text-white' : 'text-slate-800'}`}>Data Management</h1>
+          <p className={isDark ? 'text-gray-400' : 'text-slate-600'}>Export, import, and backup your financial data</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Export Section */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-slate-200">
+          <div className={`rounded-xl shadow-lg p-6 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-slate-200'}`}>
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Download className="w-6 h-6 text-blue-600" />
+              <div className={`p-3 rounded-lg ${isDark ? 'bg-blue-900/30' : 'bg-blue-100'}`}>
+                <Download className={`w-6 h-6 ${isDark ? 'text-blue-400' : 'text-blue-600'}`} />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-800">Export Data</h2>
-                <p className="text-sm text-slate-600">Download your transactions</p>
+                <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>Export Data</h2>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-slate-600'}`}>Download your transactions</p>
               </div>
             </div>
 
@@ -390,9 +392,9 @@ const DataManagement = () => {
                 <Download className="w-5 h-5" />
               </button>
 
-              <div className="mt-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-                <h3 className="font-semibold text-slate-700 mb-2">Export Details</h3>
-                <ul className="text-sm text-slate-600 space-y-1">
+              <div className={`mt-6 p-4 rounded-lg ${isDark ? 'bg-gray-700/50 border border-gray-600' : 'bg-slate-50 border border-slate-200'}`}>
+                <h3 className={`font-semibold mb-2 ${isDark ? 'text-gray-200' : 'text-slate-700'}`}>Export Details</h3>
+                <ul className={`text-sm space-y-1 ${isDark ? 'text-gray-400' : 'text-slate-600'}`}>
                   <li>• Includes {transactions.length} transaction records</li>
                   <li>• Preserves categories and dates</li>
                   <li>• Compatible with Excel and Google Sheets</li>
@@ -402,19 +404,19 @@ const DataManagement = () => {
           </div>
 
           {/* Import Section */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-slate-200">
+          <div className={`rounded-xl shadow-lg p-6 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-slate-200'}`}>
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Upload className="w-6 h-6 text-green-600" />
+              <div className={`p-3 rounded-lg ${isDark ? 'bg-green-900/30' : 'bg-green-100'}`}>
+                <Upload className={`w-6 h-6 ${isDark ? 'text-green-400' : 'text-green-600'}`} />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-800">Import Data</h2>
-                <p className="text-sm text-slate-600">Upload CSV transactions</p>
+                <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>Import Data</h2>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-slate-600'}`}>Upload CSV transactions</p>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-green-400 transition-colors">
+              <div className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${isDark ? 'border-gray-600 hover:border-green-500' : 'border-slate-300 hover:border-green-400'}`}>
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -424,11 +426,11 @@ const DataManagement = () => {
                   id="file-upload"
                 />
                 <label htmlFor="file-upload" className="cursor-pointer">
-                  <Upload className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-                  <p className="text-slate-700 font-medium mb-1">
+                  <Upload className={`w-12 h-12 mx-auto mb-3 ${isDark ? 'text-gray-500' : 'text-slate-400'}`} />
+                  <p className={`font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-slate-700'}`}>
                     {importFile ? importFile.name : 'Click to upload CSV file'}
                   </p>
-                  <p className="text-sm text-slate-500">or drag and drop</p>
+                  <p className={`text-sm ${isDark ? 'text-gray-500' : 'text-slate-500'}`}>or drag and drop</p>
                 </label>
               </div>
 
@@ -443,24 +445,24 @@ const DataManagement = () => {
               )}
 
               {importStatus === 'success' && (
-                <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
+                <div className={`flex items-center gap-2 p-4 rounded-lg ${isDark ? 'bg-green-900/30 border border-green-800 text-green-400' : 'bg-green-50 border border-green-200 text-green-700'}`}>
                   <CheckCircle className="w-5 h-5 flex-shrink-0" />
                   <span className="font-medium">Import successful!</span>
                 </div>
               )}
 
               {importStatus === 'error' && validationErrors.length > 0 && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex items-center gap-2 text-red-700 mb-2">
+                <div className={`p-4 rounded-lg ${isDark ? 'bg-red-900/30 border border-red-800' : 'bg-red-50 border border-red-200'}`}>
+                  <div className={`flex items-center gap-2 mb-2 ${isDark ? 'text-red-400' : 'text-red-700'}`}>
                     <AlertCircle className="w-5 h-5 flex-shrink-0" />
                     <span className="font-semibold">Validation Errors:</span>
                   </div>
-                  <ul className="text-sm text-red-600 space-y-1 ml-7">
+                  <ul className={`text-sm space-y-1 ml-7 ${isDark ? 'text-red-400' : 'text-red-600'}`}>
                     {validationErrors.slice(0, 5).map((error, index) => (
                       <li key={index}>• {error}</li>
                     ))}
                     {validationErrors.length > 5 && (
-                      <li className="text-red-500 italic">...and {validationErrors.length - 5} more errors</li>
+                      <li className={`italic ${isDark ? 'text-red-500' : 'text-red-500'}`}>...and {validationErrors.length - 5} more errors</li>
                     )}
                   </ul>
                 </div>
@@ -468,15 +470,15 @@ const DataManagement = () => {
 
               <button
                 onClick={downloadSampleCSV}
-                className="w-full py-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors text-sm font-medium"
+                className={`w-full py-2 rounded-lg transition-colors text-sm font-medium ${isDark ? 'text-green-400 hover:bg-green-900/20' : 'text-green-600 hover:bg-green-50'}`}
               >
                 Download Sample CSV
               </button>
 
-              <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                <h3 className="font-semibold text-slate-700 mb-2">CSV Format</h3>
-                <p className="text-xs text-slate-600 mb-2">Required columns:</p>
-                <code className="text-xs bg-slate-200 px-2 py-1 rounded block text-slate-800">
+              <div className={`p-4 rounded-lg ${isDark ? 'bg-gray-700/50 border border-gray-600' : 'bg-slate-50 border border-slate-200'}`}>
+                <h3 className={`font-semibold mb-2 ${isDark ? 'text-gray-200' : 'text-slate-700'}`}>CSV Format</h3>
+                <p className={`text-xs mb-2 ${isDark ? 'text-gray-400' : 'text-slate-600'}`}>Required columns:</p>
+                <code className={`text-xs px-2 py-1 rounded block ${isDark ? 'bg-gray-800 text-gray-300' : 'bg-slate-200 text-slate-800'}`}>
                   date, type, category, amount, payee
                 </code>
               </div>
@@ -484,14 +486,14 @@ const DataManagement = () => {
           </div>
 
           {/* Backup Section */}
-          <div className="bg-white rounded-xl shadow-lg p-6 border border-slate-200 lg:col-span-2">
+          <div className={`rounded-xl shadow-lg p-6 lg:col-span-2 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-slate-200'}`}>
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <Database className="w-6 h-6 text-purple-600" />
+              <div className={`p-3 rounded-lg ${isDark ? 'bg-purple-900/30' : 'bg-purple-100'}`}>
+                <Database className={`w-6 h-6 ${isDark ? 'text-purple-400' : 'text-purple-600'}`} />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-800">Data Backup</h2>
-                <p className="text-sm text-slate-600">Create and restore complete backups</p>
+                <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-slate-800'}`}>Data Backup</h2>
+                <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-slate-600'}`}>Create and restore complete backups</p>
               </div>
             </div>
 
@@ -529,53 +531,53 @@ const DataManagement = () => {
             </div>
 
             <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                <h4 className="font-semibold text-purple-900 mb-2">What's Included</h4>
-                <ul className="text-sm text-purple-700 space-y-1">
+              <div className={`p-4 rounded-lg ${isDark ? 'bg-purple-900/20 border border-purple-800' : 'bg-purple-50 border border-purple-200'}`}>
+                <h4 className={`font-semibold mb-2 ${isDark ? 'text-purple-300' : 'text-purple-900'}`}>What's Included</h4>
+                <ul className={`text-sm space-y-1 ${isDark ? 'text-purple-400' : 'text-purple-700'}`}>
                   <li>• All transactions</li>
                   <li>• Categories & budgets</li>
                   <li>• App settings</li>
                 </ul>
               </div>
 
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <h4 className="font-semibold text-blue-900 mb-2">File Format</h4>
-                <p className="text-sm text-blue-700">JSON format with timestamp and version info</p>
+              <div className={`p-4 rounded-lg ${isDark ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50 border border-blue-200'}`}>
+                <h4 className={`font-semibold mb-2 ${isDark ? 'text-blue-300' : 'text-blue-900'}`}>File Format</h4>
+                <p className={`text-sm ${isDark ? 'text-blue-400' : 'text-blue-700'}`}>JSON format with timestamp and version info</p>
               </div>
 
-              <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
-                <h4 className="font-semibold text-amber-900 mb-2">Recommendation</h4>
-                <p className="text-sm text-amber-700">Create weekly backups for data safety</p>
+              <div className={`p-4 rounded-lg ${isDark ? 'bg-amber-900/20 border border-amber-800' : 'bg-amber-50 border border-amber-200'}`}>
+                <h4 className={`font-semibold mb-2 ${isDark ? 'text-amber-300' : 'text-amber-900'}`}>Recommendation</h4>
+                <p className={`text-sm ${isDark ? 'text-amber-400' : 'text-amber-700'}`}>Create weekly backups for data safety</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Statistics */}
-        <div className="mt-6 bg-white rounded-xl shadow-lg p-6 border border-slate-200">
-          <h3 className="text-lg font-bold text-slate-800 mb-4">Current Data Summary</h3>
+        <div className={`mt-6 rounded-xl shadow-lg p-6 ${isDark ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-slate-200'}`}>
+          <h3 className={`text-lg font-bold mb-4 ${isDark ? 'text-white' : 'text-slate-800'}`}>Current Data Summary</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <div className="text-3xl font-bold text-blue-600">{transactions.length}</div>
-              <div className="text-sm text-slate-600 mt-1">Transactions</div>
+            <div className={`text-center p-4 rounded-lg ${isDark ? 'bg-blue-900/20 border border-blue-800' : 'bg-blue-50'}`}>
+              <div className={`text-3xl font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{transactions.length}</div>
+              <div className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-slate-600'}`}>Transactions</div>
             </div>
-            <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-3xl font-bold text-green-600">
+            <div className={`text-center p-4 rounded-lg ${isDark ? 'bg-green-900/20 border border-green-800' : 'bg-green-50'}`}>
+              <div className={`text-3xl font-bold ${isDark ? 'text-green-400' : 'text-green-600'}`}>
                 {new Set(transactions.map(t => t.category)).size}
               </div>
-              <div className="text-sm text-slate-600 mt-1">Categories</div>
+              <div className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-slate-600'}`}>Categories</div>
             </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-3xl font-bold text-purple-600">
+            <div className={`text-center p-4 rounded-lg ${isDark ? 'bg-purple-900/20 border border-purple-800' : 'bg-purple-50'}`}>
+              <div className={`text-3xl font-bold ${isDark ? 'text-purple-400' : 'text-purple-600'}`}>
                 {transactions.length > 0 ? Math.ceil((new Date() - new Date(transactions[transactions.length - 1].date)) / (1000 * 60 * 60 * 24)) : 0}
               </div>
-              <div className="text-sm text-slate-600 mt-1">Days of Data</div>
+              <div className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-slate-600'}`}>Days of Data</div>
             </div>
-            <div className="text-center p-4 bg-amber-50 rounded-lg">
-              <div className="text-3xl font-bold text-amber-600">
+            <div className={`text-center p-4 rounded-lg ${isDark ? 'bg-amber-900/20 border border-amber-800' : 'bg-amber-50'}`}>
+              <div className={`text-3xl font-bold ${isDark ? 'text-amber-400' : 'text-amber-600'}`}>
                 {(JSON.stringify(transactions).length / 1024).toFixed(2)}KB
               </div>
-              <div className="text-sm text-slate-600 mt-1">Data Size</div>
+              <div className={`text-sm mt-1 ${isDark ? 'text-gray-400' : 'text-slate-600'}`}>Data Size</div>
             </div>
           </div>
         </div>

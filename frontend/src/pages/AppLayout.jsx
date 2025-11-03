@@ -8,15 +8,17 @@ import MultiAccountManager from "./MultiAccountManager";
 import DataManagement from "./DataManagement";
 import SettingsDashboard from "./Settings";
 import BudgetManagement from "./BudgetManagement";
+import { useTheme } from '../contexts/ThemeContext'
 
 
 export const AppLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const { isDark } = useTheme();
 
     return (
         <>
             <Navbar />
-            <div className="flex min-h-screen bg-white">
+            <div className={`flex min-h-screen ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
                 {/* Sidebar */}
                 <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 

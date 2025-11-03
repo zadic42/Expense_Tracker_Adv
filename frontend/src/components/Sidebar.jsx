@@ -11,9 +11,11 @@ import {
   ChevronRightIcon,
   BanknotesIcon,
 } from '@heroicons/react/24/outline'
+import { useTheme } from '../contexts/ThemeContext'
 
 const Sidebar = ({ isOpen, setIsOpen }) => {
   const location = useLocation()
+  const { isDark } = useTheme();
 
   const navItems = [
     { name: 'Dashboard', icon: HomeIcon, path: '/dashboard' },
@@ -25,17 +27,17 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
   ]
 
   return (
-    <div className={`fixed top-16 left-0 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 z-40 transition-all duration-300 ${isOpen ? 'w-48' : 'w-16'}`}>
+    <div className={`fixed top-16 left-0 h-[calc(100vh-4rem)] ${isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'} border-r z-40 transition-all duration-300 ${isOpen ? 'w-48' : 'w-16'}`}>
       {/* Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="absolute -right-4 top-6 bg-white border border-gray-200 rounded-full p-1.5 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className={`absolute -right-4 top-6 ${isDark ? 'bg-gray-800 border-gray-700 hover:bg-gray-700' : 'bg-white border-gray-200 hover:bg-gray-50'} border rounded-full p-1.5 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500`}
         aria-label={isOpen ? 'Collapse sidebar' : 'Expand sidebar'}
       >
         {isOpen ? (
-          <ChevronLeftIcon className="h-4 w-4 text-gray-500" />
+          <ChevronLeftIcon className={`h-4 w-4 ${isDark ? 'text-gray-400' : 'text-gray-500'}`} />
         ) : (
-          <ChevronRightIcon className="h-4 w-4 text-gray-500" />
+          <ChevronRightIcon className={`h-4 w-4 ${isDark ? 'text-gray-400' : 'text-gray-500'}`} />
         )}
       </button>
 
@@ -49,11 +51,19 @@ const Sidebar = ({ isOpen, setIsOpen }) => {
               to={item.path}
               className={`flex items-center px-4 py-3 text-sm font-medium transition-colors duration-200 ${
                 isActive
-                  ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
-                  : 'text-gray-700 hover:bg-gray-50'
+                  ? isDark 
+                    ? 'bg-blue-900/50 text-blue-400 border-r-2 border-blue-400'
+                    : 'bg-blue-50 text-blue-700 border-r-2 border-blue-700'
+                  : isDark
+                    ? 'text-gray-300 hover:bg-gray-800'
+                    : 'text-gray-700 hover:bg-gray-50'
               }`}
             >
-              <item.icon className={`${isOpen ? 'h-5 w-5 mr-3' : 'h-6 w-6 mx-auto'} ${isActive ? 'text-blue-700' : 'text-gray-500'}`} />
+              <item.icon className={`${isOpen ? 'h-5 w-5 mr-3' : 'h-6 w-6 mx-auto'} ${
+                isActive 
+                  ? isDark ? 'text-blue-400' : 'text-blue-700'
+                  : isDark ? 'text-gray-400' : 'text-gray-500'
+              }`} />
               {isOpen && <span>{item.name}</span>}
             </Link>
           )

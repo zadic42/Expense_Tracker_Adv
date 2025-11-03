@@ -4,18 +4,34 @@ const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 const { body, validationResult } = require('express-validator');
 const crypto = require('crypto');
+const axios = require('axios');
+require('dotenv').config();
 const nodemailer = require('nodemailer');
 
-// Configure nodemailer (basic setup - you may need to configure based on your email provider)
+// Configure nodemailer
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-  port: process.env.EMAIL_PORT || 587,
+  host: 'smtp-relay.brevo.com',
+  port: 587,
   secure: false,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
 });
+
+transporter.verify((err, success) => {
+  if (err) {
+    console.error('❌ SMTP error:', err);
+  } else {
+    console.log('✅ Ready to send emails');
+  }
+});
+
+// Google OAuth configuration
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI;
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 // @route   POST /api/auth/signup
 // @desc    Register a new user
@@ -36,20 +52,17 @@ router.post(
 
       const { name, email, password } = req.body;
 
-      // Check if user exists
       const userExists = await User.findOne({ email });
       if (userExists) {
         return res.status(400).json({ message: 'User already exists' });
       }
 
-      // Create user
       const user = await User.create({
         name,
         email,
         password,
       });
 
-      // Generate token
       const token = generateToken(user._id);
 
       res.status(201).json({
@@ -85,21 +98,18 @@ router.post(
 
       const { email, password } = req.body;
 
-      // Check if user exists and get password
       const user = await User.findOne({ email }).select('+password');
 
       if (!user) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
-      // Check password
       const isMatch = await user.matchPassword(password);
 
       if (!isMatch) {
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
-      // Generate token
       const token = generateToken(user._id);
 
       res.json({
@@ -131,27 +141,22 @@ router.post('/forgot-password', async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      // Don't reveal if user exists or not for security
       return res.json({
         message: 'If an account with that email exists, a password reset link has been sent.',
       });
     }
 
-    // Generate reset token
     const resetToken = crypto.randomBytes(20).toString('hex');
 
-    // Hash token and save to database
     user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+    user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
     await user.save({ validateBeforeSave: false });
 
-    // Create reset URL
     const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
 
-    // Send email (commented out if email is not configured)
     try {
       await transporter.sendMail({
-        from: process.env.EMAIL_USER,
+        from: '"Expense Tracker" <zadic42@gmail.com>',
         to: user.email,
         subject: 'Password Reset Request',
         html: `
@@ -162,13 +167,11 @@ router.post('/forgot-password', async (req, res) => {
           <p>If you did not request this, please ignore this email.</p>
         `,
       });
-
       res.json({
         message: 'If an account with that email exists, a password reset link has been sent.',
       });
     } catch (emailError) {
       console.error('Email error:', emailError);
-      // Still return success message even if email fails (security)
       res.json({
         message: 'If an account with that email exists, a password reset link has been sent.',
       });
@@ -180,11 +183,102 @@ router.post('/forgot-password', async (req, res) => {
 });
 
 // @route   GET /api/auth/google
-// @desc    Google OAuth (placeholder - would need OAuth setup)
+// @desc    Initiate Google OAuth
 // @access  Public
 router.get('/google', (req, res) => {
-  res.json({ message: 'Google OAuth integration needs to be configured' });
+  if (!GOOGLE_CLIENT_ID) {
+    return res.status(500).json({ message: 'Google OAuth is not configured' });
+  }
+
+  const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+  const params = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    redirect_uri: GOOGLE_REDIRECT_URI,
+    response_type: 'code',
+    scope: 'openid email profile',
+    access_type: 'offline',
+    prompt: 'consent'
+  });
+  
+  res.redirect(`${authUrl}?${params.toString()}`);
+});
+
+// @route   GET /api/auth/google/callback
+// @desc    Handle Google OAuth callback
+// @access  Public
+// @route   GET /api/auth/google/callback
+// @desc    Handle Google OAuth callback
+// @access  Public
+router.get('/google/callback', async (req, res) => {
+  const { code, error } = req.query;
+  
+  if (error) {
+    return res.redirect(`${FRONTEND_URL}/login?error=${encodeURIComponent(error)}`);
+  }
+  
+  if (!code) {
+    return res.redirect(`${FRONTEND_URL}/login?error=No authorization code received`);
+  }
+  
+  try {
+    // Exchange code for tokens
+    const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
+      code,
+      client_id: GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET,
+      redirect_uri: GOOGLE_REDIRECT_URI,
+      grant_type: 'authorization_code'
+    });
+    
+    const { access_token } = tokenResponse.data;
+    
+    // Get user info from Google
+    const userResponse = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: {
+        Authorization: `Bearer ${access_token}`
+      }
+    });
+    
+    const { id: googleId, email, name, picture } = userResponse.data;
+    
+    // Check if user exists
+    let user = await User.findOne({ email });
+    
+    if (user) {
+      // Update existing user with Google info if not already set
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.picture = picture;
+        await user.save();
+      }
+    } else {
+      // Create new user
+      user = await User.create({
+        name,
+        email,
+        googleId,
+        picture,
+        password: crypto.randomBytes(32).toString('hex') // Random password for OAuth users
+      });
+    }
+    
+    // Generate JWT token
+    const token = generateToken(user._id);
+    
+    // Redirect to frontend with token AND user data
+    const params = new URLSearchParams({
+      token,
+      id: user._id.toString(),
+      email: user.email,
+      name: user.name
+    });
+    
+    res.redirect(`${FRONTEND_URL}/login?${params.toString()}`);
+    
+  } catch (error) {
+    console.error('Google OAuth error:', error.response?.data || error.message);
+    res.redirect(`${FRONTEND_URL}/login?error=Authentication failed`);
+  }
 });
 
 module.exports = router;
-
