@@ -10,6 +10,7 @@ const GoogleOAuthButton = ({ text = 'Continue with Google', fullWidth = false })
   const { handleOAuthCallback } = useAuth();
   const { showError, showSuccess } = useToast();
   const hasProcessedCallback = useRef(false);
+  console.log('API URL:', import.meta.env.VITE_BACKEND_API_URL);
 
   // Check for OAuth callback when component mounts
   useEffect(() => {
@@ -66,7 +67,7 @@ const GoogleOAuthButton = ({ text = 'Continue with Google', fullWidth = false })
 
   const handleGoogleLogin = () => {
     try {
-      const apiUrl = 'http://localhost:3001';
+      const apiUrl = import.meta.env.VITE_BACKEND_API_URL;
       console.log('Initiating Google login, redirecting to:', `${apiUrl}/api/auth/google`);
       // Just redirect to the backend OAuth endpoint
       // The backend handles the redirect_uri internally
