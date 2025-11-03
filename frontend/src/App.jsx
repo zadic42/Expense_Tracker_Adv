@@ -5,6 +5,7 @@ import ForgotPassword from './pages/ForgotPassword'
 import { AppLayout } from './pages/AppLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import { ThemeProvider } from './contexts/ThemeContext'
+import PasswordReset from './pages/PasswordReset'
 
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
       <Route path="/login" element={<UserLogin />} />
       <Route path="/signup" element={<UserSignup />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<PasswordReset />} />
         <Route
           path="/*"
           element={

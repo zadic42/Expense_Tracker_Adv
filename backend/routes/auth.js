@@ -152,7 +152,10 @@ router.post('/forgot-password', async (req, res) => {
     user.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `${req.protocol}://${req.get('host')}/reset-password/${resetToken}`;
+    // CHANGE THIS LINE - use frontend URL instead of backend URL
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+    // Or use environment variable:
+    // const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
 
     try {
       await transporter.sendMail({
@@ -182,6 +185,45 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
+router.post('/reset-password/:token', async (req, res) => {
+  try {
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ message: 'Password is required' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+
+    const resetPasswordToken = crypto
+      .createHash('sha256')
+      .update(req.params.token)
+      .digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired reset token' });
+    }
+
+    // Set the new password (it will be hashed by the User model's pre-save hook)
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save();
+
+    res.json({ message: 'Password reset successful' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 // @route   GET /api/auth/google
 // @desc    Initiate Google OAuth
 // @access  Public
@@ -199,7 +241,7 @@ router.get('/google', (req, res) => {
     access_type: 'offline',
     prompt: 'consent'
   });
-  
+
   res.redirect(`${authUrl}?${params.toString()}`);
 });
 
@@ -211,15 +253,15 @@ router.get('/google', (req, res) => {
 // @access  Public
 router.get('/google/callback', async (req, res) => {
   const { code, error } = req.query;
-  
+
   if (error) {
     return res.redirect(`${FRONTEND_URL}/login?error=${encodeURIComponent(error)}`);
   }
-  
+
   if (!code) {
     return res.redirect(`${FRONTEND_URL}/login?error=No authorization code received`);
   }
-  
+
   try {
     // Exchange code for tokens
     const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
@@ -229,21 +271,21 @@ router.get('/google/callback', async (req, res) => {
       redirect_uri: GOOGLE_REDIRECT_URI,
       grant_type: 'authorization_code'
     });
-    
+
     const { access_token } = tokenResponse.data;
-    
+
     // Get user info from Google
     const userResponse = await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
       headers: {
         Authorization: `Bearer ${access_token}`
       }
     });
-    
+
     const { id: googleId, email, name, picture } = userResponse.data;
-    
+
     // Check if user exists
     let user = await User.findOne({ email });
-    
+
     if (user) {
       // Update existing user with Google info if not already set
       if (!user.googleId) {
@@ -261,10 +303,10 @@ router.get('/google/callback', async (req, res) => {
         password: crypto.randomBytes(32).toString('hex') // Random password for OAuth users
       });
     }
-    
+
     // Generate JWT token
     const token = generateToken(user._id);
-    
+
     // Redirect to frontend with token AND user data
     const params = new URLSearchParams({
       token,
@@ -272,9 +314,9 @@ router.get('/google/callback', async (req, res) => {
       email: user.email,
       name: user.name
     });
-    
+
     res.redirect(`${FRONTEND_URL}/login?${params.toString()}`);
-    
+
   } catch (error) {
     console.error('Google OAuth error:', error.response?.data || error.message);
     res.redirect(`${FRONTEND_URL}/login?error=Authentication failed`);
