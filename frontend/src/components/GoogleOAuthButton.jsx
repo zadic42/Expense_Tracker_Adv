@@ -81,7 +81,7 @@ const GoogleOAuthButton = ({ text = 'Continue with Google', fullWidth = false })
     <button
       type="button"
       onClick={handleGoogleLogin}
-      className={`flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
+      className={`flex items-center justify-center w-full gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${
         fullWidth ? 'w-full' : ''
       }`}
     >
