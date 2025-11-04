@@ -126,7 +126,7 @@ const Navbar = () => {
               <div className="h-10 w-10 rounded-full bg-blue-500 text-white flex items-center justify-center text-sm font-medium overflow-hidden">
                 {user.profilePicture ? (
                   <img 
-                    src={`http://localhost:3001/uploads/${user.profilePicture}`}
+                    src={`${import.meta.env.VITE_BACKEND_API_URL}/uploads/${user.profilePicture}`}
                     alt={user.name} 
                     className="h-full w-full object-cover"
                     onLoad={(e) => console.log('Image loaded successfully')}

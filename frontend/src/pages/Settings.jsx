@@ -147,7 +147,7 @@ export default function SettingsDashboard() {
                 <div className="relative">
                   {profileData.profilePicture ? (
                     <img 
-                      src={`http://localhost:3001/uploads/${profileData.profilePicture}`}
+                      src={`${import.meta.env.VITE_BACKEND_API_URL}/uploads/${profileData.profilePicture}`}
                       alt="Profile"
                       className="w-24 h-24 rounded-full object-cover"
                     />
