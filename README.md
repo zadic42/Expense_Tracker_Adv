@@ -27,8 +27,3 @@ A modern and responsive Expense Tracker web application that helps users manage 
 
 **Backend**
 - Node.js / Express / MongoDB
-
-**Deployment**
-- Render
-
----
